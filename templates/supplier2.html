@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+  <h2>Add Supplier</h2>
+  <form method="POST" action="{{ url_for('suppliers') }}" enctype="application/x-www-form-urlencoded">
+    <label>Supplier ID</label>
+    <input type="text" name="supplier_id" required placeholder="e.g. S10">
+
+    <label>Supplier Name</label>
+    <input type="text" name="supplier_name" required placeholder="e.g. Eco Supply Co.">
+
+    <button type="submit">Add Supplier</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Attach Sourcing (Select supplier then choose what they supply)</h3>
+
+  <label>Choose Supplier</label>
+  <select id="supplierSelect">
+    {% for s in suppliers %}
+      <option value="{{ s.SupplierID }}">{{ s.SupplierName }}</option>
+    {% endfor %}
+  </select>
+
+  <label>Supply Type</label>
+  <select id="supplyType">
+    <option value="component">Component</option>
+    <option value="material">Material</option>
+  </select>
+
+  <div id="componentBox">
+    <label>Component</label>
+    <select id="componentSelect">
+      {% for c in components %}
+        <option value="{{ c.ComponentID }}">{{ c.ComponentName }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div id="materialBox" style="display:none;">
+    <label>Material</label>
+    <select id="materialSelect">
+      {% for m in materials %}
+        <option value="{{ m.MaterialID }}">{{ m.MaterialName }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <button id="addSourcingBtn" type="button">Add Sourcing</button>
+  <div id="sourcingMsg" style="margin-top:10px; color:crimson; font-weight:600;"></div>
+</div>
+
+<div class="card">
+  <h3>Suppliers & What They Supply</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Supplier ID</th>
+        <th>Supplier Name</th>
+        <th>Component</th>
+        <th>Material</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in sourcing %}
+      <tr>
+        <td>{{ row.SupplierName }}</td>
+        <td>{{ row.ComponentName or '-' }}</td>
+        <td>{{ row.MaterialName or '-' }}</td>
+        <td>{{ supplier_types.get(row.SupplierID, 'Unknown') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('supplyType').addEventListener('change', function() {
+  const isComponent = this.value === 'component';
+  document.getElementById('componentBox').style.display = isComponent ? 'block' : 'none';
+  document.getElementById('materialBox').style.display = isComponent ? 'none' : 'block';
+});
+
+document.getElementById('addSourcingBtn').addEventListener('click', function() {
+  const supplier_id = document.getElementById('supplierSelect').value;
+  const type = document.getElementById('supplyType').value;
+  const item_id = type === 'component'
+    ? document.getElementById('componentSelect').value
+    : document.getElementById('materialSelect').value;
+
+  const form = new FormData();
+  form.append('supplier_id', supplier_id);
+  form.append('supply_type', type);
+  form.append('item_id', item_id);
+
+  fetch('{{ url_for("add_sourcing") }}', { method: 'POST', body: form })
+    .then(res => res.json())
+    .then(js => {
+      const msg = document.getElementById('sourcingMsg');
+      if (js.status === 'ok') {
+        msg.style.color = 'green';
+        msg.innerText = '✅ ' + js.message;
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        msg.style.color = 'crimson';
+        msg.innerText = js.message || 'Error';
+      }
+    })
+    .catch(err => {
+      document.getElementById('sourcingMsg').innerText = 'Error: ' + err;
+    });
+});
+</script>
+{% endblock %}

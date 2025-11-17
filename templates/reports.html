@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card tabs">
+  <div class="tab-controls">
+    <button id="btn-life" onclick="showTab('tab-life')">Lifecycle Analytics</button>
+    <button id="btn-trace" onclick="showTab('tab-trace')">Material Trace</button>
+    <button id="btn-hierarchy" onclick="showTab('tab-hierarchy')">Component Hierarchy</button>
+  </div>
+
+  <div id="tab-life" class="tab">
+    <h3>Lifecycle Analytics</h3>
+    <form method="POST">
+      <input type="hidden" name="report_type" value="lifecycle">
+      <label>Select Instance</label>
+      <select name="instance_id" required>
+        {% for inst in instances %}
+          <option value="{{ inst.InstanceID }}"
+                  {% if inst.InstanceID|string == selected_instance_id %}selected{% endif %}>
+            {{ inst.SerialNumber }}
+          </option>
+        {% endfor %}
+      </select>
+      <button type="submit">View Timeline</button>
+    </form>
+
+    {% if selected_instance_serial %}
+      <h4>Timeline for: {{ selected_instance_serial }}</h4>
+
+      {% if age_in_days is not none %}
+        <p style="font-size: 1.1em; margin: 10px 0;">
+            <strong>Current Age:</strong> {{ age_in_days }} days since manufacture
+        </p>
+      {% else %}
+        <p style="color:gray; margin: 10px 0;">
+            Age cannot be calculated (missing 'Manufactured' event).
+        </p>
+      {% endif %}
+      {% endif %}
+
+    {% if lifecycle_timeline %}
+      <table>
+        <thead>
+          <tr><th>Event</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          {% for e in lifecycle_timeline %}
+            <tr><td>{{ e.EventType }}</td><td>{{ e.EventTime }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% elif selected_instance_serial %}
+      <p style="color:gray; margin-top:10px;">No events found for this instance.</p>
+    {% endif %}
+  </div>
+
+  <div id="tab-trace" class="tab" style="display:none;">
+    <h3>Material Trace</h3>
+    <form method="POST">
+      <input type="hidden" name="report_type" value="trace">
+      <label>Select Product</label>
+      <select name="product_id" required>
+        {% for p in products %}
+          <option value="{{ p.ProductID }}"
+                  {% if p.ProductID|string == selected_product_id %}selected{% endif %}>
+            {{ p.ModelName }}
+          </option>
+        {% endfor %}
+      </select>
+      <button type="submit">View Trace</button>
+    </form>
+
+    {% if selected_product_name %}
+      <h4>Trace Result for: {{ selected_product_name }}</h4>
+    {% endif %}
+
+    {% if trace_rows %}
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th><th>Material</th><th>Recyclable Grade</th><th>Hazardous</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in trace_rows %}
+            <tr>
+              <td>{{ r.ComponentName }}</td>
+              <td>{{ r.MaterialName }}</td>
+              <td>{{ r.RecyclableGrade }}</td>
+              <td>{{ r.IsHazardous }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% elif selected_product_name %}
+      <p style="color:gray; margin-top:10px;">No data found for this product.</p>
+    {% endif %}
+  </div>
+
+  <div id="tab-hierarchy" class="tab" style="display:none;">
+    <h3>Component Hierarchy</h3>
+    <table id="hierarchyTable">
+      <thead>
+        <tr>
+          <th>Component ID</th>
+          <th>Component Name</th>
+          <th>Summary (Subcomponents)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in component_hierarchy %}
+          <tr>
+            <td>{{ c.ComponentID }}</td>
+            <td>{{ c.ComponentName }}</td>
+            <td>{{ c.Summary }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div> 
+<input id="has_trace_rows" type="hidden" value="{% if trace_rows %}1{% else %}0{% endif %}">
+<input id="has_lifecycle_rows" type="hidden" value="{% if lifecycle_timeline %}1{% else %}0{% endif %}">
+
+{% endblock %} 
+{% block scripts %}
+<script>
+/* Tab switching function */
+function showTab(id) {
+  // Show or hide tabs
+  var life = document.getElementById('tab-life');
+  var trace = document.getElementById('tab-trace');
+  var hierarchy = document.getElementById('tab-hierarchy');
+  if (hierarchy) hierarchy.style.display = (id === 'tab-hierarchy') ? 'block' : 'none';
+
+
+  if (life) life.style.display = (id === 'tab-life') ? 'block' : 'none';
+  if (trace) trace.style.display = (id === 'tab-trace') ? 'block' : 'none';
+
+  // Toggle active class on buttons
+  var btnLife = document.getElementById('btn-life');
+  var btnTrace = document.getElementById('btn-trace');
+  var btnHierarchy = document.getElementById('btn-hierarchy');
+  if (btnHierarchy) btnHierarchy.classList.toggle('active', id === 'tab-hierarchy');
+  if (btnLife) btnLife.classList.toggle('active', id === 'tab-life');
+  if (btnTrace) btnTrace.classList.toggle('active', id === 'tab-trace');
+
+  // remember last open tab
+  try { localStorage.setItem('activeTab', id); } catch (e) { /* ignore */ }
+}
+
+/* On load: pick the right tab using DOM flags (no templating in JS) */
+document.addEventListener('DOMContentLoaded', function() {
+  var activeTab = null;
+  try { activeTab = localStorage.getItem('activeTab'); } catch (e) { activeTab = null; }
+
+  // Read flags set by Jinja into hidden inputs
+  var hasTrace = document.getElementById('has_trace_rows')?.value === '1';
+  var hasLifecycle = document.getElementById('has_lifecycle_rows')?.value === '1';
+
+  if (hasTrace) {
+    showTab('tab-trace');
+  } else if (hasLifecycle) {
+    showTab('tab-life');
+  } else {
+    // If no data was returned, check local storage
+    // or default to a starting tab
+    showTab(activeTab || 'tab-life');
+  }
+});
+</script>
+
+<style>
+.tab-controls { display:flex; gap:10px; margin-bottom:15px; }
+.tab-controls button {
+  padding:8px 14px; border:none; background:#e0e0e0; border-radius:6px; cursor:pointer;
+  font-weight:500; transition:all .15s ease;
+}
+.tab-controls button.active { background:#2b7cff; color:white; font-weight:600; box-shadow:0 2px 6px rgba(0,0,0,.15); }
+.tab { margin-top:15px; }
+</style>
+{% endblock %}

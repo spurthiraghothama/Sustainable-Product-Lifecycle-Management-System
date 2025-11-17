@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="kpi-row">
+  <div class="kpi-card">
+    <h3>Total Products</h3><p>{{ total_products }}</p>
+  </div>
+  <div class="kpi-card">
+    <h3>Total Components</h3><p>{{ total_components }}</p>
+  </div>
+  <div class="kpi-card">
+    <h3>Total Raw Materials</h3><p>{{ total_materials }}</p>
+  </div>
+  <div class="kpi-card">
+    <h3>Total Suppliers</h3><p>{{ total_suppliers }}</p>
+  </div>
+  <div class="kpi-card">
+    <h3>Total Product Instances</h3><p>{{ total_instances }}</p>
+  </div>
+  <div class="kpi-card">
+    <h3>Total Lifecycle Events</h3><p>{{ total_events }}</p>
+  </div>
+</section>
+
+<section class="dashboard-charts">
+  <div class="card">
+    <h3>Lifecycle Outcomes</h3>
+    <canvas id="lifecycleDonut" width="300" height="300"></canvas>
+  </div>
+  <div class="card">
+    <h3>Recyclability Score</h3>
+    <div class="big-score">{{ overall_recyclability_score }} / 4.0</div>
+    <p>Weighted average recyclability (higher is better)</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<!-- Serialize values safely -->
+<script id="chart-data" type="application/json">
+{
+  "recycled": {{ recycled | tojson }},
+  "disposed": {{ disposed | tojson }},
+  "repair": {{ repair | tojson }}
+}
+</script>
+
+<script>
+const raw = document.getElementById('chart-data').textContent;
+const parsed = JSON.parse(raw);
+
+const ctx = document.getElementById('lifecycleDonut').getContext('2d');
+const data = {
+  labels: ['Recycled', 'Disposed', 'Repair'],
+  datasets: [{
+    data: [parsed.recycled, parsed.disposed, parsed.repair],
+    backgroundColor: ['#2ecc71', '#34495e', '#f1c40f']
+  }]
+};
+
+new Chart(ctx, {
+  type: 'doughnut',
+  data: data,
+  options: {
+    plugins: {
+      legend: { position: 'bottom' },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const value = context.raw;
+            const percent = ((value / total) * 100).toFixed(1);
+            return `${context.label}: ${value} (${percent}%)`;
+          }
+        }
+      }
+    }
+  }
+});
+</script>
+{% endblock %}

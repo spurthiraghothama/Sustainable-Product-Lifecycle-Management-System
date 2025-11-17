@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h2>Register New Product Instance</h2>
+  <form method="POST">
+    <label>Serial Number</label>
+    <input name="serial" required placeholder="ALPHA-0003">
+
+    <label>Product</label>
+    <select name="product_id" required>
+      {% for p in products %}
+        <option value="{{ p.ProductID }}">{{ p.ProductID }} — {{ p.ModelName }}</option>
+      {% endfor %}
+    </select>
+
+    <!-- thumbnail preview is optional; using placeholder images per product id -->
+    <div class="thumb-note">Thumbnail will display next to selection (demo thumbnails)</div>
+
+    <button type="submit">Register</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Recently Registered Instances</h3>
+  <table>
+    <tr><th>Serial</th><th>Product</th><th>State</th></tr>
+    {% for r in recent %}
+      <tr>
+        <td>{{ r.SerialNumber }}</td>
+        <td>{{ r.ProductID }}</td>
+        <td><span class="status {{ r.current_state | lower }}">{{ r.current_state }}</span></td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

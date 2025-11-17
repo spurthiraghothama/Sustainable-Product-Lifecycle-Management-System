@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h2>Lifecycle Events</h2>
+  <form method="POST">
+    <label>Select Instance</label>
+    <select name="instance_id">
+      {% for inst in instances %}
+        <option value="{{ inst.InstanceID }}" {% if selected==inst.InstanceID %}selected{% endif %}>{{ inst.SerialNumber }}</option>
+      {% endfor %}
+    </select>
+
+    <div class="event-buttons">
+      <button name="event_type" value="Manufactured" class="btn btn-grey">Manufactured</button>
+      <button name="event_type" value="Sold" class="btn btn-blue">Sold</button>
+      <button name="event_type" value="Repair" class="btn btn-yellow">Repair</button>
+      <button name="event_type" value="Recycled" class="btn btn-green">Recycled</button>
+      <button name="event_type" value="Recycled_Hazardous" class="btn btn-red-outline">Hazardous Recycled</button>
+      <button name="event_type" value="Disposed" class="btn btn-black">Disposed</button>
+    </div>
+  </form>
+</div>
+
+{% if timeline %}
+<div class="card">
+  <h3>Lifecycle Timeline (selected instance)</h3>
+  <div class="timeline-vert">
+    {% for t in timeline %}
+      <div class="t-item">
+        <div class="t-dot"></div>
+        <div class="t-content">
+          <strong>{{ t.EventType }}</strong>
+          <div class="t-date">{{ t.EventTime }}</div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

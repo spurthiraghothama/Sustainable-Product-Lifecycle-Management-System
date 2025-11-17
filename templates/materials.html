@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+  <h2>View Component Composition</h2>
+  <form method="GET" action="{{ url_for('materials') }}">
+    <label for="component_select">Select Component to View:</label>
+    <select name="component" id="component_select" onchange="this.form.submit()">
+      <option value="">-- Select a Component --</option>
+      {% for c in components %}
+      <option value="{{ c.ComponentID }}" {% if selected_component == c.ComponentID %}selected{% endif %}>
+        {{ c.ComponentName }}
+      </option>
+      {% endfor %}
+    </select>
+    <noscript><button type="submit">View</button></noscript>
+  </form>
+</div>
+
+
+{% if selected_component %}
+
+<div class="card">
+  <h3>Add Material to Component</h3>
+  <form method="POST" action="{{ url_for('materials') }}">
+    <input type="hidden" name="component_id" value="{{ selected_component }}">
+
+    <label>Material</label>
+    <select name="material_id" required>
+      {% for m in materials %}
+      <option value="{{ m.MaterialID }}">
+        {{ m.MaterialName }}{% if m.IsHazardous %} (Hazard){% endif %}
+      </option>
+      {% endfor %}
+    </select>
+
+    <label>Weight (g)</label>
+    <input type="range" min="1" max="5000" id="wRange" value="100">
+    <input type="number" id="wNum" value="100" step="0.01" name="weight_num" required>
+
+    <button type="submit">Add Composition</button>
+  </form>
+</div>
+
+{% if compositions %}
+<div class="card flex-row">
+  <div>
+    <h3>Composition Details ({{ compositions[0].ComponentID }})</h3>
+    <table>
+      <tr>
+        <th>Material</th>
+        <th>Weight (g)</th>
+        <th>Hazard</th>
+      </tr>
+      {% for c in compositions %}
+      <tr>
+        <td>{{ c.MaterialName }}</td>
+        <td>{{ c.WeightInGrams }}</td>
+        <td>
+          {% if c.IsHazardous %}
+          <span class="haz">⚠️ Hazard</span>
+          {% else %}
+          -
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div style="width:320px;">
+    <h3>Material % by Weight</h3>
+    <canvas id="compDonut" width="300" height="300"></canvas>
+  </div>
+</div>
+
+<script id="composition-data" type="application/json">
+  {
+    "labels": {{ composition_chart_data.labels | tojson }},
+    "weights": {{ composition_chart_data.weights | tojson }}
+  }
+</script>
+
+{% else %}
+<div class="card">
+  <p>No composition data found for this component yet. You can add one above.</p>
+</div>
+{% endif %} {% endif %} {% endblock %}
+
+
+{% block scripts %}
+<script>
+  // --- Sync range and number inputs ---
+  const range = document.getElementById('wRange');
+  const num = document.getElementById('wNum');
+  if (range && num) {
+    // Sync range slider to number input
+    range.addEventListener('input', () => num.value = range.value);
+    // Sync number input to range slider
+    num.addEventListener('input', () => {
+      // Ensure value is within the range's bounds before setting
+      let value = parseFloat(num.value);
+      if (value > parseFloat(range.max)) value = parseFloat(range.max);
+      if (value < parseFloat(range.min)) value = parseFloat(range.min);
+      range.value = value;
+    });
+  }
+
+  // --- Donut Chart Rendering ---
+  const jsonBlock = document.getElementById('composition-data');
+  if (jsonBlock) {
+    try {
+      const chartData = JSON.parse(jsonBlock.textContent);
+      if (chartData.labels && chartData.labels.length > 0) {
+        const ctx = document.getElementById('compDonut').getContext('2d');
+        new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: chartData.labels,
+            datasets: [{
+              data: chartData.weights,
+              backgroundColor: ['#4caf50', '#ff9800', '#2196f3', '#9c27b0', '#607d8b', '#f44336', '#cddc39']
+            }]
+          },
+          options: {
+            plugins: {
+              legend: { position: 'bottom' },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const total = context.dataset.data.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    const value = parseFloat(context.raw);
+                    const percent = ((value / total) * 100).toFixed(1);
+                    return `${context.label}: ${value}g (${percent}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    } catch (e) {
+      console.error('Chart JSON parsing failed:', e);
+    }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card tabs">
+  <div class="tab-controls">
+    <button onclick="showTab('tab-life')">Lifecycle Analytics</button>
+    <button onclick="showTab('tab-trace')">Material Trace</button>
+  </div>
+
+  <div id="tab-life" class="tab">
+    <h3>Lifecycle Analytics</h3>
+    <form method="POST">
+      <input type="hidden" name="report_type" value="lifecycle">
+      <label>Select Instance</label>
+      <select name="instance_id">
+        {% for inst in instances %}
+          <option value="{{ inst.InstanceID }}">{{ inst.SerialNumber }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">View Timeline</button>
+    </form>
+
+    {% if lifecycle_timeline %}
+      <h4>Timeline</h4>
+      <table>
+        <tr><th>Event</th><th>Date</th></tr>
+        {% for e in lifecycle_timeline %}
+          <tr><td>{{ e.EventType }}</td><td>{{ e.EventTime }}</td></tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+  </div>
+
+  <div id="tab-trace" class="tab" style="display:none;">
+    <h3>Material Trace</h3>
+    <form method="POST">
+      <input type="hidden" name="report_type" value="trace">
+      <label>Select Product</label>
+      <select name="product_id">
+        {% for p in products %}
+          <option value="{{ p.ProductID }}">{{ p.ModelName }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">View Trace</button>
+    </form>
+
+    {% if trace_rows %}
+      <h4>Trace Result</h4>
+      <table>
+        <tr><th>Component</th><th>Material</th><th>Weight (g)</th><th>Grade</th></tr>
+        {% for r in trace_rows %}
+          <tr>
+            <td>{{ r.ComponentName }}</td>
+            <td>{{ r.MaterialName }}</td>
+            <td>{{ r.WeightInGrams }}</td>
+            <td>{{ r.RecyclableGrade }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showTab(id) {
+  document.getElementById('tab-life').style.display = (id==='tab-life') ? 'block' : 'none';
+  document.getElementById('tab-trace').style.display = (id==='tab-trace') ? 'block' : 'none';
+}
+</script>
+{% endblock %}
