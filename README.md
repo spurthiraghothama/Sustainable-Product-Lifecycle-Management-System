@@ -7,35 +7,35 @@ The Sustainable Product Lifecycle Management System is a comprehensive digital d
 
 In an era where sustainability and resource efficiency are global priorities, this system acts as a digital record—a "Material Passport"—that follows every product from its design stage to its end-of-life phase. Its primary goal is to provide complete traceability from a finished product back to its raw materials. This transparency supports the principles of a circular economy, ensuring materials are reused, recycled, or disposed of safely, thereby reducing environmental damage and operational costs.
 
-##User Requirement Specification
+## User Requirement Specification
 
 The system is engineered to manage comprehensive data including:
--Constituent components and their hierarchical assembly.
--Raw materials and their hazardous status.
--Suppliers of specific materials.
--A complete log of significant lifecycle events (manufacturing, repair, recycling).
+* Constituent components and their hierarchical assembly.
+* Raw materials and their hazardous status.
+* Suppliers of specific materials.
+* A complete log of significant lifecycle events (manufacturing, repair, recycling).
 
 Scope
 The functional scope involves capturing and relating information across the product's life:
--Product Tracking: Managing generic product models and unique physical instances (Serial Numbers).
--Bill of Materials (BOM): Defining hierarchical parent-child relationships for assemblies.
--Material Composition: Cataloging raw materials, flagging hazardous items, and recording precise weights.
--Supply Chain: Linking suppliers to the specific components or materials they provide.
--Lifecycle Logging: Timestamping events such as manufacturing, inspection, and recycling.
+* Product Tracking: Managing generic product models and unique physical instances (Serial Numbers).
+* Bill of Materials (BOM): Defining hierarchical parent-child relationships for assemblies.
+* Material Composition: Cataloging raw materials, flagging hazardous items, and recording precise weights.
+* Supply Chain: Linking suppliers to the specific components or materials they provide.
+* Lifecycle Logging: Timestamping events such as manufacturing, inspection, and recycling.
 
 ## Target Users
 
-Manufacturing Engineers: Manage product models and BOM data.
-Procurement Officers: Handle supplier records and sourcing.
-Environmental Compliance Teams: Review material compositions and hazardous flags.
-Recyclers: Access product passports to identify recoverable materials.
+* Manufacturing Engineers: Manage product models and BOM data.
+* Procurement Officers: Handle supplier records and sourcing.
+* Environmental Compliance Teams: Review material compositions and hazardous flags.
+* Recyclers: Access product passports to identify recoverable materials.
 
 ## Technical stack
--Database Management System: MySQL
--Query Language: SQL
--Administration Tool: MySQL Workbench
--Frontend Prototyping: HTML, CSS, JavaScript
--Version Control: Git & GitHub
+* Database Management System: MySQL
+* Query Language: SQL
+* Administration Tool: MySQL Workbench
+* Frontend Prototyping: HTML, CSS, JavaScript
+* Version Control: Git & GitHub
 
 ## Database Schema Architecture
 The database is normalized and structured around four core areas.
@@ -111,37 +111,25 @@ This project utilizes advanced DBMS features to ensure data integrity and automa
 
 1.  **Clone the Repository**
     ```bash
-    git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
+    git clone https://github.com/spurthiraghothama/Sustainable-Product-Lifecycle-Management-System.git
     ```
 
 2.  **Database Setup**
     * Open MySQL Workbench.
-    * Open the file `new_circular.sql` located in the root directory.
+    * Open the file `commands.sql` located in the root directory.
     * Execute the script. This will:
-        * Create the `new_circular` database.
+        * Create the `circular_economy_db` database.
         * Create all tables and constraints.
         * Insert mock data for testing.
         * Define all functions, procedures, and triggers.
 
 3.  **Frontend Setup**
-    * Navigate to the `project_ui` folder.
-    * Open `index.html` in any modern web browser to view the prototype interface.
+    * Run app.py
 
-## Project Structure
-
-* `new_circular.sql`: The master SQL script containing DDL (Schema), DML (Mock Data), and PL/SQL (Triggers/Procedures).
-* `project_ui/`: Contains the frontend prototype.
-    * `index.html`: Main user interface.
-    * `style.css`: Styling and layout.
-    * `app.js`: Client-side logic for the prototype.
-* `README.md`: Project documentation.
 
 ## Team Details
 
-* **[Your Name 1]** - [Your ID]
-* **[Your Name 2]** - [Your ID]
 * **SHRUJANNA M** - PES1UG23CS570
 * **SPURTHI RAGHOTHAMA** - PES1UG23CS590
 
----
-*Submitted for the Course [Course Name] - [Semester/Year]*
+## Licensing This project is developed for academic purposes at **PES University**.
