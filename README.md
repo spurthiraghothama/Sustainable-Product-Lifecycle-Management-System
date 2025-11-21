@@ -15,7 +15,7 @@ The system is engineered to manage comprehensive data including:
 * Suppliers of specific materials.
 * A complete log of significant lifecycle events (manufacturing, repair, recycling).
 
-Scope
+## Scope
 The functional scope involves capturing and relating information across the product's life:
 * Product Tracking: Managing generic product models and unique physical instances (Serial Numbers).
 * Bill of Materials (BOM): Defining hierarchical parent-child relationships for assemblies.
