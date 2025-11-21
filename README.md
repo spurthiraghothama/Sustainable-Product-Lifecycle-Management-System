@@ -40,21 +40,21 @@ The functional scope involves capturing and relating information across the prod
 ## Database Schema Architecture
 The database is normalized and structured around four core areas.
 
-1. Core Entities
+* 1. Core Entities
 Products: Stores generic model information.
 Components: Stores individual parts used in assemblies.
 RawMaterials: Tracks material types, hazardous status, and recyclable grades.
 Suppliers: Manages vendor information.
 
-2. Instances & Events
+* 2. Instances & Events
 ProductInstances: Links specific serial numbers to the generic Product ID.
 LifecycleEvents: Records the history (Event Type, Date) for each specific instance.
 
-3. Composition & Hierarchy
+* 3. Composition & Hierarchy
 BillOfMaterial: A recursive table defining parent-child component relationships and quantities.
 ComponentComposition: Links components to raw materials with specific weights.
 
-4. Sourcing
+* 4. Sourcing
 Sourcing: Connects suppliers to either a Component or a Material using a check constraint to ensure valid data entry.
 
 
