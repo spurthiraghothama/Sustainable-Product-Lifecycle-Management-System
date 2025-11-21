@@ -125,4 +125,6 @@ This project utilizes advanced DBMS features to ensure data integrity and automa
 * **SHRUJANNA M** - PES1UG23CS570
 * **SPURTHI RAGHOTHAMA** - PES1UG23CS590
 
-## Licensing This project is developed for academic purposes at **PES University**.
+## Licensing 
+
+This project is developed for academic purposes at **PES University**.
