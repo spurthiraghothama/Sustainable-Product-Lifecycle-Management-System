@@ -58,13 +58,6 @@ ComponentComposition: Links components to raw materials with specific weights.
 Sourcing: Connects suppliers to either a Component or a Material using a check constraint to ensure valid data entry.
 
 
-* **Product Genealogy:** Distinguishes between generic product models and individual serial-numbered instances.
-* **Bill of Materials (BOM) Management:** Recursive tracking of product composition (assemblies and sub-assemblies).
-* **Material Composition Analysis:** precise tracking of raw material weights and hazardous material flags for compliance.
-* **Supply Chain Transparency:** Links suppliers directly to the specific components or raw materials they provide.
-* **Lifecycle Logging:** Immutable history of events including Manufacturing, Sales, Repairs, and End-of-Life Disposal.
-* **Automated Validation:** Database triggers ensure logical consistency (e.g., preventing the disposal of unsold items).
-
 ## Tech Stack
 
 * **Database:** MySQL 8.0+
